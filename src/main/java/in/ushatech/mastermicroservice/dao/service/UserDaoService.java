@@ -28,19 +28,19 @@ public class UserDaoService
 
     public User save(User user)
     {
-        user.setUserId(++userCount);
+        user.setId(++userCount);
         users.add(user);
         return user;
     }
     public User findOne(int id)
     {
-        Predicate<? super User> predicate = user -> user.getUserId().equals(id);
+        Predicate<? super User> predicate = user -> user.getId().equals(id);
         return  users.stream().filter(predicate).findFirst().orElse(null);
     }
 
     public void deleteUser(int id)
     {
-        boolean result = users.removeIf(user-> user.getUserId().equals(id));
+        boolean result = users.removeIf(user-> user.getId().equals(id));
 
     }
 }

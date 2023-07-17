@@ -57,7 +57,7 @@ public List<User> retrieveAllUsers()
         User savedUser = userDaoService.save(user);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(savedUser.getUserId())
+                .buildAndExpand(savedUser.getId())
                 .toUri();
         return ResponseEntity.created(location).build();
     }

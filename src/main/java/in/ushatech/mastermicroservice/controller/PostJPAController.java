@@ -1,20 +1,18 @@
 package in.ushatech.mastermicroservice.controller;
 
 import in.ushatech.mastermicroservice.dao.service.PostDaoService;
-import in.ushatech.mastermicroservice.dao.service.UserDaoService;
 import in.ushatech.mastermicroservice.domain.Post;
-import in.ushatech.mastermicroservice.domain.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class PostController
+public class PostJPAController
 {
     PostDaoService postDaoService;
 
-    public PostController( PostDaoService postDaoService) {
+    public PostJPAController(PostDaoService postDaoService) {
         this.postDaoService=postDaoService;
     }
 @GetMapping(path="/posts")
