@@ -1,8 +1,9 @@
 package in.ushatech.mastermicroservice.controller;
 
-import in.ushatech.mastermicroservice.dao.service.UserDaoService;
+import in.ushatech.mastermicroservice.domain.Post;
 import in.ushatech.mastermicroservice.domain.User;
 import in.ushatech.mastermicroservice.exception.UserNotFoundException;
+import in.ushatech.mastermicroservice.repository.PostRepository;
 import in.ushatech.mastermicroservice.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.hateoas.EntityModel;
@@ -22,9 +23,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class UserJpaController
 {
     UserRepository userRepository;
+    PostRepository postRepository;
 
-    public UserJpaController(UserRepository userRepository) {
+    public UserJpaController(UserRepository userRepository, PostRepository postRepository) {
         this.userRepository = userRepository;
+        this.postRepository = postRepository;
     }
 
     @GetMapping(path="/jpa/users")
@@ -56,13 +59,46 @@ public List<User> retrieveAllUsers()
     }
 
     @PostMapping("jpa/users")
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user)
-    {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         User savedUser = userRepository.save(user);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
                 .buildAndExpand(savedUser.getId())
                 .toUri();
         return ResponseEntity.created(location).build();
+    }
+
+
+    @GetMapping(path = "/jpa/users/{id}/posts")
+    public List<Post> retrieveAllPostsForUser(@PathVariable(name = "id") int userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (!optionalUser.isPresent()) {
+            throw new UserNotFoundException("User not found for user id :" + userId);
+        }
+        User user = optionalUser.get();
+        System.out.println("user" + user);
+        List<Post> posts = user.getPosts();
+        System.out.println("posts" + posts);
+        return posts;
+    }
+
+    @PostMapping("jpa/users/{id}/posts")
+    public ResponseEntity<List<Post>> createUserPost(@PathVariable int id, @Valid @RequestBody Post post) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (!optionalUser.isPresent()) {
+            throw new UserNotFoundException("User not found for user id :" + id);
+        }
+        User user = optionalUser.get();
+        post.setUser(user);
+        Post postSaved = postRepository.save(post);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("{id}")
+                .buildAndExpand(postSaved.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).build();
+
     }
 }
